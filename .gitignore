@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+myntra/node_modules/
+backend/node_modules/
+
+# Production builds
+myntra/build/
+backend/build/
+
+# Environment files & secrets
+.env
+.env*
+*.env
+myntra/.env
+backend/.env
+backend/.env.atlas
+
+# Caches & temporary files
+*.log
+.expo/
+.vercel/

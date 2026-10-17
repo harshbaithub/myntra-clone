@@ -1,0 +1,188 @@
+[
+  {
+    "id": 1,
+    "name": "Casual White T-Shirt",
+    "brand": "Roadster",
+    "price": 499,
+    "discount": "60% OFF",
+    "description": "Classic white t-shirt made from premium cotton. Perfect for everyday wear with a comfortable regular fit.",
+    "sizes": ["S", "M", "L", "XL"],
+    "category": "Men",
+    "subcategory": "T-Shirts",
+    "images": [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1562157873-818bc0726f68?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Denim Jacket",
+    "brand": "Levis",
+    "price": 2499,
+    "discount": "40% OFF",
+    "description": "Classic denim jacket with a modern twist. Features premium quality denim and comfortable fit.",
+    "sizes": ["S", "M", "L", "XL"],
+    "category": "Men",
+    "subcategory": "Shirts",
+    "images": [
+      "https://images.unsplash.com/photo-1523205771623-e0faa4d2813d?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1601933973783-43cf8a7d4c5f?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Summer Dress",
+    "brand": "ONLY",
+    "price": 1299,
+    "discount": "50% OFF",
+    "description": "Flowy summer dress perfect for warm weather. Made from lightweight fabric with a flattering cut.",
+    "sizes": ["XS", "S", "M", "L"],
+    "category": "Women",
+    "subcategory": "Dresses",
+    "images": [
+      "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1623609163859-ca93c959b98a?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 4,
+    "name": "Classic Sneakers",
+    "brand": "Nike",
+    "price": 3499,
+    "discount": "30% OFF",
+    "description": "Versatile sneakers that combine style and comfort. Perfect for both casual wear and light exercise.",
+    "sizes": ["UK6", "UK7", "UK8", "UK9", "UK10"],
+    "category": "Men",
+    "subcategory": "Activewear",
+    "images": [
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Boys Graphic Cotton T-Shirt",
+    "brand": "Hopscotch",
+    "price": 449,
+    "discount": "50% OFF",
+    "description": "Super soft 100% combed cotton t-shirt with playful cartoon print for boys. Breathable and gentle on delicate skin.",
+    "sizes": ["2-3Y", "3-4Y", "5-6Y", "7-8Y"],
+    "category": "Kids",
+    "subcategory": "Boys Clothing",
+    "images": [
+      "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1503944583220-79d8926ad5e2?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Girls Floral Party Frock",
+    "brand": "Gini & Jony",
+    "price": 899,
+    "discount": "45% OFF",
+    "description": "Elegant floral print party dress with tulle flared skirt and satin waist ribbon. Perfect for birthdays and family functions.",
+    "sizes": ["3-4Y", "5-6Y", "7-8Y", "9-10Y"],
+    "category": "Kids",
+    "subcategory": "Girls Clothing",
+    "images": [
+      "https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 7,
+    "name": "Infant Denim Dungaree Set",
+    "brand": "Mothercare",
+    "price": 999,
+    "discount": "40% OFF",
+    "description": "Adorable soft denim dungaree with inner cotton striped t-shirt. Easy snap button closure for quick diaper changes.",
+    "sizes": ["6-12M", "12-18M", "18-24M"],
+    "category": "Kids",
+    "subcategory": "Infants",
+    "images": [
+      "https://images.unsplash.com/photo-1522771930-78848d9293e8?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1543332164-6e82f355badc?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 8,
+    "name": "Kids School Bag & Water Bottle Set",
+    "brand": "Hamleys",
+    "price": 799,
+    "discount": "35% OFF",
+    "description": "Ergonomic lightweight backpack with padded shoulder straps, water-resistant exterior, and matching spill-proof bottle.",
+    "sizes": ["Standard"],
+    "category": "Kids",
+    "subcategory": "School Essentials",
+    "images": [
+      "https://images.unsplash.com/photo-1588072432836-e10032774350?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1546938576-6e6a64f317cc?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 9,
+    "name": "Velvet Matte Liquid Lipstick",
+    "brand": "Maybelline",
+    "price": 599,
+    "discount": "25% OFF",
+    "description": "16-hour long lasting ultra-pigmented liquid matte lipstick. Smudge-proof and transfer-proof comfortable wear.",
+    "sizes": ["Standard"],
+    "category": "Beauty",
+    "subcategory": "Makeup",
+    "images": [
+      "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1627384113743-6bd5a479fffd?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 10,
+    "name": "Hydrating Vitamin C Brightening Serum",
+    "brand": "The Ordinary",
+    "price": 849,
+    "discount": "20% OFF",
+    "description": "Potent 10% Vitamin C serum with Hyaluronic Acid. Boosts collagen, targets dark spots, and imparts radiant glowing skin.",
+    "sizes": ["30ml", "50ml"],
+    "category": "Beauty",
+    "subcategory": "Skincare",
+    "images": [
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1608248597359-2187a3cb98e4?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 11,
+    "name": "Luxury French Eau De Parfum",
+    "brand": "Chanel",
+    "price": 3999,
+    "discount": "15% OFF",
+    "description": "An enchanting blend of floral jasmine, vanilla notes, and subtle woody base for a lasting, sophisticated aura.",
+    "sizes": ["50ml", "100ml"],
+    "category": "Beauty",
+    "subcategory": "Fragrances",
+    "images": [
+      "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1547887537-6158d64c35b3?w=500&auto=format&fit=crop"
+    ]
+  },
+  {
+    "id": 12,
+    "name": "Nourishing Moroccan Argan Hair Oil",
+    "brand": "L'Oreal Paris",
+    "price": 499,
+    "discount": "35% OFF",
+    "description": "Deeply nourishing hair oil infused with pure Argan oil and Vitamin E. Eliminates frizz and restores brilliant silky shine.",
+    "sizes": ["100ml", "200ml"],
+    "category": "Beauty",
+    "subcategory": "Haircare",
+    "images": [
+      "https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=500&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1535585209827-a15fcdbc4c2d?w=500&auto=format&fit=crop"
+    ]
+  }
+]
+
+  

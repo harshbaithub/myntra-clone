@@ -1,0 +1,92 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/(category|Order|activity|notification|recommendations)(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/user/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/product",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/bag/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/wishlist/(.*)",
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "header",
+          "key": "content-type",
+          "value": ".*application/json.*"
+        }
+      ],
+      "destination": "/api/index.js"
+    },
+    {
+      "source": "/categories",
+      "destination": "/categories.html"
+    },
+    {
+      "source": "/wishlist",
+      "destination": "/wishlist.html"
+    },
+    {
+      "source": "/bag",
+      "destination": "/bag.html"
+    },
+    {
+      "source": "/profile",
+      "destination": "/profile.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/signup",
+      "destination": "/signup.html"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/checkout.html"
+    },
+    {
+      "source": "/orders",
+      "destination": "/orders.html"
+    },
+    {
+      "source": "/notifications",
+      "destination": "/notifications.html"
+    },
+    {
+      "source": "/settings",
+      "destination": "/settings.html"
+    },
+    {
+      "source": "/addresses",
+      "destination": "/addresses.html"
+    },
+    {
+      "source": "/recently-viewed",
+      "destination": "/recently-viewed.html"
+    },
+    {
+      "source": "/product/(.*)",
+      "destination": "/product/[id].html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
