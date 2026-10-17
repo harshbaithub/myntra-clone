@@ -4,6 +4,8 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  useWindowDimensions,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import {
@@ -18,6 +20,7 @@ import {
   Clock,
   Palette,
   Bell,
+  ArrowLeft,
 } from "lucide-react-native";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
@@ -25,6 +28,7 @@ import { useActivity } from "@/context/ActivityContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useNotifications } from "@/context/NotificationContext";
 import ThemeSelector from "@/components/ThemeSelector";
+import DesktopNavbar from "@/components/DesktopNavbar";
 
 const menuItems = [
   { icon: Bell, label: "Notification Center", route: "/notifications", badgeKey: "notifications" },
@@ -37,10 +41,20 @@ const menuItems = [
 
 export default function Profile() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const { user, logout } = useAuth();
   const { recentlyViewed } = useActivity();
   const { unreadCount } = useNotifications();
   const { colors, theme, themeMode } = useTheme();
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push("/(tabs)");
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -50,14 +64,27 @@ export default function Profile() {
   if (!user) {
     return (
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        <View
-          style={[
-            styles.header,
-            { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-          ]}
-        >
-          <Text style={[styles.headerTitle, { color: colors.title }]}>Profile</Text>
-        </View>
+        {isDesktop && <DesktopNavbar />}
+        {isDesktop ? (
+          <View style={styles.desktopTopBackContainer}>
+            <TouchableOpacity style={styles.desktopBackRow} onPress={handleBack} activeOpacity={0.7}>
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Shopping</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.header,
+              { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+            ]}
+          >
+            <TouchableOpacity style={styles.backButton} onPress={handleBack} accessibilityLabel="Back">
+              <ArrowLeft size={22} color={colors.title} />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: colors.title }]}>Profile</Text>
+          </View>
+        )}
         <View style={styles.emptyState}>
           <View style={[styles.emptyIconCircle, { backgroundColor: colors.primaryLight }]}>
             <User size={56} color={colors.primary} />
@@ -68,12 +95,20 @@ export default function Profile() {
           <Text style={[styles.emptySub, { color: colors.sub }]}>
             Sync your wishlist, order history, and personal theme across devices.
           </Text>
-          <TouchableOpacity
-            style={[styles.loginButton, { backgroundColor: colors.primary }]}
-            onPress={() => router.push("/login")}
-          >
-            <Text style={styles.loginButtonText}>LOGIN / SIGN UP</Text>
-          </TouchableOpacity>
+          <View style={styles.emptyButtonRow}>
+            <TouchableOpacity
+              style={[styles.loginButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.loginButtonText}>LOGIN / SIGN UP</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.continueButton, { borderColor: colors.border }]}
+              onPress={handleBack}
+            >
+              <Text style={[styles.continueButtonText, { color: colors.title }]}>CONTINUE SHOPPING</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -81,16 +116,36 @@ export default function Profile() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <View
-        style={[
-          styles.header,
-          { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-        ]}
-      >
-        <Text style={[styles.headerTitle, { color: colors.title }]}>Profile</Text>
-      </View>
+      {isDesktop ? (
+        <DesktopNavbar />
+      ) : (
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+          ]}
+        >
+          <TouchableOpacity style={styles.backButton} onPress={handleBack} accessibilityLabel="Back">
+            <ArrowLeft size={22} color={colors.title} />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, { color: colors.title, flex: 1 }]}>Profile</Text>
+        </View>
+      )}
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ maxWidth: 800, width: "100%", alignSelf: "center", paddingBottom: 60 }}
+      >
+        {isDesktop && (
+          <View style={styles.desktopHeaderArea}>
+            <TouchableOpacity style={styles.desktopBackRow} onPress={handleBack} activeOpacity={0.7}>
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Shopping</Text>
+            </TouchableOpacity>
+            <Text style={[styles.desktopTitle, { color: colors.title }]}>My Profile</Text>
+          </View>
+        )}
         {/* User Card */}
         <View
           style={[
@@ -205,12 +260,63 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: Platform.OS === "web" ? 16 : 50,
     paddingBottom: 16,
     borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backButton: {
+    padding: 6,
+    marginRight: 10,
+    borderRadius: 8,
+  },
+  desktopTopBackContainer: {
+    maxWidth: 800,
+    width: "100%",
+    alignSelf: "center",
+    paddingTop: 20,
+    paddingHorizontal: 16,
+  },
+  desktopBackRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+  },
+  desktopBackText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  desktopHeaderArea: {
+    marginBottom: 16,
+    paddingTop: 8,
+    paddingHorizontal: 16,
+  },
+  desktopTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  emptyButtonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  continueButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  continueButtonText: {
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
   },
   content: {

@@ -11,6 +11,7 @@ import {
   TextInput,
   RefreshControl,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
 import {
@@ -30,6 +31,7 @@ import {
   ShieldCheck,
   ArrowRight,
   Sparkles,
+  ArrowLeft,
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
@@ -235,12 +237,33 @@ export default function Bag() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push("/(tabs)");
+    }
+  };
+
   if (!user) {
     return (
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        <View style={[styles.header, { backgroundColor: colors.header, borderBottomColor: colors.headerBorder }]}>
-          <Text style={[styles.headerTitle, { color: colors.title }]}>Shopping Bag</Text>
-        </View>
+        {isDesktop && <DesktopNavbar />}
+        {isDesktop ? (
+          <View style={styles.desktopTopBackContainer}>
+            <TouchableOpacity style={styles.desktopBackRow} onPress={handleBack} activeOpacity={0.7}>
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Shopping</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={[styles.header, { backgroundColor: colors.header, borderBottomColor: colors.headerBorder }]}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBack} accessibilityLabel="Back">
+              <ArrowLeft size={22} color={colors.title} />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: colors.title, flex: 1 }]}>Shopping Bag</Text>
+          </View>
+        )}
         <View style={styles.emptyState}>
           <View style={[styles.emptyIconCircle, { backgroundColor: colors.primaryLight }]}>
             <ShoppingBag size={48} color={colors.primary} />
@@ -249,12 +272,20 @@ export default function Bag() {
           <Text style={[styles.emptySubtitle, { color: colors.sub }]}>
             Your shopping cart and saved items sync seamlessly across all your devices.
           </Text>
-          <TouchableOpacity
-            style={[styles.loginButton, { backgroundColor: colors.primary }]}
-            onPress={() => router.push("/login")}
-          >
-            <Text style={styles.loginButtonText}>LOGIN TO ACCOUNT</Text>
-          </TouchableOpacity>
+          <View style={styles.emptyButtonRow}>
+            <TouchableOpacity
+              style={[styles.loginButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.loginButtonText}>LOGIN TO ACCOUNT</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.continueButton, { borderColor: colors.border }]}
+              onPress={handleBack}
+            >
+              <Text style={[styles.continueButtonText, { color: colors.title }]}>CONTINUE SHOPPING</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -262,9 +293,12 @@ export default function Bag() {
 
   if (isLoading) {
     return (
-      <View style={[styles.loaderContainer, { backgroundColor: colors.bg }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={{ marginTop: 12, color: colors.sub, fontSize: 13 }}>Syncing smart cart...</Text>
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
+        {isDesktop && <DesktopNavbar />}
+        <View style={[styles.loaderContainer, { backgroundColor: colors.bg }]}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={{ marginTop: 12, color: colors.sub, fontSize: 13 }}>Syncing smart cart...</Text>
+        </View>
       </View>
     );
   }
@@ -277,8 +311,11 @@ export default function Bag() {
       {isDesktop ? (
         <DesktopNavbar />
       ) : (
-        /* Top Header */
+        /* Top Header for Mobile */
         <View style={[styles.header, { backgroundColor: colors.header, borderBottomColor: colors.headerBorder }]}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack} accessibilityLabel="Back">
+            <ArrowLeft size={22} color={colors.title} />
+          </TouchableOpacity>
           <View style={{ flex: 1 }}>
             <Text style={[styles.headerTitle, { color: colors.title }]}>Shopping Bag</Text>
             <Text style={[styles.headerSub, { color: colors.sub }]}>
@@ -298,6 +335,26 @@ export default function Bag() {
         contentContainerStyle={{ maxWidth: 1000, width: "100%", alignSelf: "center", paddingBottom: 60 }}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
       >
+        {isDesktop && (
+          <View style={styles.desktopHeaderArea}>
+            <TouchableOpacity style={styles.desktopBackRow} onPress={handleBack} activeOpacity={0.7}>
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Shopping</Text>
+            </TouchableOpacity>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: 8, marginBottom: 14 }}>
+              <Text style={[styles.desktopTitle, { color: colors.title }]}>
+                Shopping Bag{" "}
+                <Text style={{ fontSize: 16, fontWeight: "500", color: colors.sub }}>
+                  ({summary.itemCount || 0} items)
+                </Text>
+              </Text>
+              <View style={[styles.headerBadge, { backgroundColor: colors.primaryLight }]}>
+                <ShieldCheck size={14} color={colors.primary} style={{ marginRight: 4 }} />
+                <Text style={[styles.headerBadgeText, { color: colors.primary }]}>Live Sync</Text>
+              </View>
+            </View>
+          </View>
+        )}
         {/* Real-time Free Shipping Progress Bar */}
         {cartItems.length > 0 && (
           <View style={[styles.freeShippingCard, { backgroundColor: colors.card, borderColor: colors.divider }]}>
@@ -706,12 +763,59 @@ const styles = StyleSheet.create({
   loaderContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: Platform.OS === "web" ? 16 : 50,
     paddingBottom: 14,
     borderBottomWidth: 1,
+  },
+  backButton: {
+    padding: 6,
+    marginRight: 10,
+    borderRadius: 8,
+  },
+  desktopTopBackContainer: {
+    maxWidth: 1000,
+    width: "100%",
+    alignSelf: "center",
+    paddingTop: 20,
+    paddingHorizontal: 16,
+  },
+  desktopBackRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+  },
+  desktopBackText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  desktopHeaderArea: {
+    marginBottom: 16,
+    paddingTop: 8,
+  },
+  desktopTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  emptyButtonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  continueButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  continueButtonText: {
+    fontSize: 13,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   headerTitle: { fontSize: 20, fontWeight: "700" },
   headerSub: { fontSize: 12, marginTop: 2 },

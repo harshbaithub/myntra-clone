@@ -8,9 +8,10 @@ import {
   Image,
   ActivityIndicator,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Heart, Trash2 } from "lucide-react-native";
+import { Heart, Trash2, ArrowLeft } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/utils/api";
@@ -24,6 +25,14 @@ export default function Wishlist() {
   const { colors } = useTheme();
   const [wishlist, setwishlist] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push("/(tabs)");
+    }
+  };
 
   useEffect(() => {
     fetchproduct();
@@ -55,14 +64,27 @@ export default function Wishlist() {
   if (!user) {
     return (
       <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        <View
-          style={[
-            styles.header,
-            { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-          ]}
-        >
-          <Text style={[styles.headerTitle, { color: colors.title }]}>Wishlist</Text>
-        </View>
+        {isDesktop && <DesktopNavbar />}
+        {isDesktop ? (
+          <View style={styles.desktopTopBackContainer}>
+            <TouchableOpacity style={styles.desktopBackRow} onPress={handleBack} activeOpacity={0.7}>
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Shopping</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View
+            style={[
+              styles.header,
+              { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+            ]}
+          >
+            <TouchableOpacity style={styles.backButton} onPress={handleBack} accessibilityLabel="Back">
+              <ArrowLeft size={22} color={colors.title} />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: colors.title }]}>Wishlist</Text>
+          </View>
+        )}
         <View style={styles.emptyState}>
           <View style={[styles.emptyIconCircle, { backgroundColor: colors.primaryLight }]}>
             <Heart size={48} color={colors.primary} />
@@ -73,12 +95,20 @@ export default function Wishlist() {
           <Text style={[styles.emptySubtitle, { color: colors.sub }]}>
             Save items you love and revisit them anytime on all your devices.
           </Text>
-          <TouchableOpacity
-            style={[styles.loginButton, { backgroundColor: colors.primary }]}
-            onPress={() => router.push("/login")}
-          >
-            <Text style={styles.loginButtonText}>LOGIN</Text>
-          </TouchableOpacity>
+          <View style={styles.emptyButtonRow}>
+            <TouchableOpacity
+              style={[styles.loginButton, { backgroundColor: colors.primary }]}
+              onPress={() => router.push("/login")}
+            >
+              <Text style={styles.loginButtonText}>LOGIN</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.continueButton, { borderColor: colors.border }]}
+              onPress={handleBack}
+            >
+              <Text style={[styles.continueButtonText, { color: colors.title }]}>CONTINUE SHOPPING</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -86,8 +116,11 @@ export default function Wishlist() {
 
   if (isLoading) {
     return (
-      <View style={[styles.loaderContainer, { backgroundColor: colors.bg }]}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
+        {isDesktop && <DesktopNavbar />}
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
       </View>
     );
   }
@@ -103,7 +136,15 @@ export default function Wishlist() {
             { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
           ]}
         >
-          <Text style={[styles.headerTitle, { color: colors.title }]}>Wishlist</Text>
+          <TouchableOpacity style={styles.backButton} onPress={handleBack} accessibilityLabel="Back">
+            <ArrowLeft size={22} color={colors.title} />
+          </TouchableOpacity>
+          <Text style={[styles.headerTitle, { color: colors.title, flex: 1 }]}>Wishlist</Text>
+          {wishlist && (
+            <Text style={[styles.headerItemCount, { color: colors.sub }]}>
+              {wishlist.length} {wishlist.length === 1 ? "item" : "items"}
+            </Text>
+          )}
         </View>
       )}
 
@@ -112,6 +153,20 @@ export default function Wishlist() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ maxWidth: 1000, width: "100%", alignSelf: "center", paddingBottom: 60 }}
       >
+        {isDesktop && (
+          <View style={styles.desktopHeaderArea}>
+            <TouchableOpacity style={styles.desktopBackRow} onPress={handleBack} activeOpacity={0.7}>
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Shopping</Text>
+            </TouchableOpacity>
+            <Text style={[styles.desktopTitle, { color: colors.title }]}>
+              My Wishlist{" "}
+              <Text style={{ fontSize: 16, fontWeight: "500", color: colors.sub }}>
+                ({wishlist ? wishlist.length : 0} items)
+              </Text>
+            </Text>
+          </View>
+        )}
         {!wishlist || wishlist.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={[styles.emptyIconCircle, { backgroundColor: colors.surface }]}>
@@ -187,13 +242,67 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: Platform.OS === "web" ? 16 : 50,
     paddingBottom: 14,
     borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backButton: {
+    padding: 6,
+    marginRight: 10,
+    borderRadius: 8,
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
+  },
+  headerItemCount: {
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  desktopTopBackContainer: {
+    maxWidth: 1000,
+    width: "100%",
+    alignSelf: "center",
+    paddingTop: 20,
+    paddingHorizontal: 16,
+  },
+  desktopBackRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 8,
+  },
+  desktopBackText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  desktopHeaderArea: {
+    marginBottom: 20,
+    paddingTop: 8,
+  },
+  desktopTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  emptyButtonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  continueButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  continueButtonText: {
+    fontSize: 14,
+    fontWeight: "700",
+    letterSpacing: 0.5,
   },
   content: {
     flex: 1,

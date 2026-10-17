@@ -9,9 +9,10 @@ import {
   ScrollView,
   ActivityIndicator,
   useWindowDimensions,
+  Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Search, X, ChevronLeft } from "lucide-react-native";
+import { Search, X, ChevronLeft, ArrowLeft } from "lucide-react-native";
 import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/utils/api";
 import DesktopNavbar from "@/components/DesktopNavbar";
@@ -213,7 +214,14 @@ export default function TabTwoScreen() {
               { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
             ]}
           >
-            <Text style={[styles.headerTitle, { color: colors.title }]}>Categories</Text>
+            <TouchableOpacity
+              style={styles.headerBackButton}
+              onPress={() => (router.canGoBack() ? router.back() : router.push("/(tabs)"))}
+              accessibilityLabel="Back"
+            >
+              <ArrowLeft size={22} color={colors.title} />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: colors.title, flex: 1 }]}>Categories</Text>
           </View>
 
           <View
@@ -251,6 +259,18 @@ export default function TabTwoScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ maxWidth: 1240, width: "100%", alignSelf: "center", paddingBottom: 60 }}
       >
+        {isDesktop && (
+          <View style={styles.desktopHeaderArea}>
+            <TouchableOpacity
+              style={styles.desktopBackRow}
+              onPress={() => (router.canGoBack() ? router.back() : router.push("/(tabs)"))}
+              activeOpacity={0.7}
+            >
+              <ArrowLeft size={18} color={colors.sub} />
+              <Text style={[styles.desktopBackText, { color: colors.sub }]}>Back to Home</Text>
+            </TouchableOpacity>
+          </View>
+        )}
         {!selectedCategory && (
           <View style={styles.categoriesGrid}>
             {filtercategories?.map((category: any) => (
@@ -367,12 +387,33 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 50,
+    paddingTop: Platform.OS === "web" ? 16 : 50,
     paddingBottom: 14,
     borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  headerBackButton: {
+    padding: 6,
+    marginRight: 10,
+    borderRadius: 8,
+  },
+  desktopHeaderArea: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  desktopBackRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  desktopBackText: {
+    fontSize: 14,
+    fontWeight: "600",
   },
   headerTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
   },
   searchContainer: {
