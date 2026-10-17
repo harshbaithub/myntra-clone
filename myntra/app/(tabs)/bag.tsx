@@ -650,7 +650,7 @@ export default function Bag() {
               <TextInput
                 style={[styles.couponInput, { backgroundColor: colors.surface, borderColor: colors.divider, color: colors.title }]}
                 placeholder="Enter code (e.g. MYNTRA200)"
-                placeholderTextColor={colors.sub}
+                placeholderTextColor={colors.placeholderText}
                 value={couponCode}
                 onChangeText={setCouponCode}
                 autoCapitalize="characters"

@@ -35,6 +35,7 @@ export default function Signup() {
     email: "",
     password: "",
   });
+  const [focusedInput, setFocusedInput] = useState<"fullName" | "email" | "password" | null>(null);
 
   const validateForm = () => {
     let isValid = true;
@@ -125,7 +126,11 @@ export default function Signup() {
               styles.input,
               {
                 backgroundColor: colors.inputBg,
-                borderColor: errors.fullName ? colors.error : colors.inputBorder,
+                borderColor: errors.fullName
+                  ? colors.error
+                  : focusedInput === "fullName"
+                  ? colors.primary
+                  : colors.inputBorder,
                 color: colors.text,
               },
             ]}
@@ -133,6 +138,8 @@ export default function Signup() {
             placeholderTextColor={colors.placeholderText}
             value={formData.fullName}
             onChangeText={(text) => setFormData({ ...formData, fullName: text })}
+            onFocus={() => setFocusedInput("fullName")}
+            onBlur={() => setFocusedInput(null)}
           />
           {errors.fullName ? (
             <Text style={[styles.errorText, { color: colors.error }]}>{errors.fullName}</Text>
@@ -146,7 +153,11 @@ export default function Signup() {
               styles.input,
               {
                 backgroundColor: colors.inputBg,
-                borderColor: errors.email ? colors.error : colors.inputBorder,
+                borderColor: errors.email
+                  ? colors.error
+                  : focusedInput === "email"
+                  ? colors.primary
+                  : colors.inputBorder,
                 color: colors.text,
               },
             ]}
@@ -156,6 +167,8 @@ export default function Signup() {
             onChangeText={(text) => setFormData({ ...formData, email: text })}
             keyboardType="email-address"
             autoCapitalize="none"
+            onFocus={() => setFocusedInput("email")}
+            onBlur={() => setFocusedInput(null)}
           />
           {errors.email ? (
             <Text style={[styles.errorText, { color: colors.error }]}>{errors.email}</Text>
@@ -169,7 +182,11 @@ export default function Signup() {
               styles.passwordContainer,
               {
                 backgroundColor: colors.inputBg,
-                borderColor: errors.password ? colors.error : colors.inputBorder,
+                borderColor: errors.password
+                  ? colors.error
+                  : focusedInput === "password"
+                  ? colors.primary
+                  : colors.inputBorder,
               },
             ]}
           >
@@ -180,6 +197,8 @@ export default function Signup() {
               value={formData.password}
               onChangeText={(text) => setFormData({ ...formData, password: text })}
               secureTextEntry={!showPassword}
+              onFocus={() => setFocusedInput("password")}
+              onBlur={() => setFocusedInput(null)}
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -272,15 +291,17 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
+    maxWidth: 480,
+    width: "100%",
+    alignSelf: "center",
     padding: 24,
     marginTop: -24,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    borderRadius: 24,
     borderWidth: 1,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
     elevation: 8,
   },
   title: {
@@ -293,7 +314,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputGroup: {
-    marginBottom: 14,
+    marginBottom: 16,
   },
   label: {
     fontSize: 13,
@@ -301,10 +322,10 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    padding: 12,
+    padding: 14,
     borderRadius: 10,
-    fontSize: 14,
-    borderWidth: 1,
+    fontSize: 15,
+    borderWidth: 1.5,
   },
   errorText: {
     fontSize: 12,
@@ -314,15 +335,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   passwordInput: {
     flex: 1,
-    padding: 12,
-    fontSize: 14,
+    padding: 14,
+    fontSize: 15,
   },
   eyeIcon: {
-    padding: 12,
+    padding: 14,
   },
   button: {
     padding: 14,

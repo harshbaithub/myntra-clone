@@ -42,8 +42,35 @@ function RootLayoutContent() {
   useEffect(() => {
     if (typeof document !== "undefined") {
       document.title = "Myntra - Online Shopping";
+      let styleEl = document.getElementById("myntra-global-input-fix") as HTMLStyleElement | null;
+      if (!styleEl) {
+        styleEl = document.createElement("style");
+        styleEl.id = "myntra-global-input-fix";
+        document.head.appendChild(styleEl);
+      }
+      styleEl.innerHTML = `
+        input, textarea, select {
+          color: ${colors.text} !important;
+          caret-color: #ff3f6c !important;
+        }
+        input::placeholder, textarea::placeholder {
+          color: ${colors.placeholderText} !important;
+          opacity: 1 !important;
+          -webkit-text-fill-color: ${colors.placeholderText} !important;
+        }
+        /* Fix Chrome/Edge/Brave dark mode autofill text invisibility */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
+          -webkit-text-fill-color: ${colors.text} !important;
+          -webkit-box-shadow: 0 0 0px 1000px ${colors.inputBg} inset !important;
+          box-shadow: 0 0 0px 1000px ${colors.inputBg} inset !important;
+          transition: background-color 5000s ease-in-out 0s;
+        }
+      `;
     }
-  }, []);
+  }, [colors]);
 
   return (
     <NavigationThemeProvider value={navTheme}>

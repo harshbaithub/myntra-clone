@@ -27,6 +27,7 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [isloading, setisloading] = useState(false);
   const [error, setError] = useState("");
+  const [focusedInput, setFocusedInput] = useState<"email" | "password" | null>(null);
 
   const handleLogin = async () => {
     try {
@@ -93,7 +94,7 @@ export default function Login() {
               styles.input,
               {
                 backgroundColor: colors.inputBg,
-                borderColor: colors.inputBorder,
+                borderColor: focusedInput === "email" ? colors.primary : colors.inputBorder,
                 color: colors.text,
               },
             ]}
@@ -103,6 +104,8 @@ export default function Login() {
             onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
+            onFocus={() => setFocusedInput("email")}
+            onBlur={() => setFocusedInput(null)}
           />
         </View>
 
@@ -113,7 +116,7 @@ export default function Login() {
               styles.passwordContainer,
               {
                 backgroundColor: colors.inputBg,
-                borderColor: colors.inputBorder,
+                borderColor: focusedInput === "password" ? colors.primary : colors.inputBorder,
               },
             ]}
           >
@@ -124,6 +127,8 @@ export default function Login() {
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
+              onFocus={() => setFocusedInput("password")}
+              onBlur={() => setFocusedInput(null)}
             />
             <TouchableOpacity
               style={styles.eyeIcon}
@@ -224,16 +229,18 @@ const styles = StyleSheet.create({
   },
   formCard: {
     flex: 1,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    maxWidth: 480,
+    width: "100%",
+    alignSelf: "center",
+    borderRadius: 24,
     marginTop: -24,
     padding: 24,
     paddingTop: 28,
     borderWidth: 1,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
     elevation: 8,
   },
   title: {
@@ -256,7 +263,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   inputWrapper: {
-    marginBottom: 14,
+    marginBottom: 16,
   },
   label: {
     fontSize: 13,
@@ -264,24 +271,24 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    padding: 12,
+    padding: 14,
     borderRadius: 10,
-    fontSize: 14,
-    borderWidth: 1,
+    fontSize: 15,
+    borderWidth: 1.5,
   },
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     borderRadius: 10,
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   passwordInput: {
     flex: 1,
-    padding: 12,
-    fontSize: 14,
+    padding: 14,
+    fontSize: 15,
   },
   eyeIcon: {
-    padding: 12,
+    padding: 14,
   },
   button: {
     padding: 14,

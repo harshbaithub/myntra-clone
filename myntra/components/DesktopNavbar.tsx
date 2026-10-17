@@ -118,7 +118,7 @@ export default function DesktopNavbar({ onSearch }: Props) {
           <Search size={18} color={colors.sub} style={styles.searchIcon} />
           <TextInput
             placeholder="Search for products, brands and more"
-            placeholderTextColor={colors.sub}
+            placeholderTextColor={colors.placeholderText}
             value={searchQuery}
             onChangeText={setSearchQuery}
             onSubmitEditing={handleSearchSubmit}
