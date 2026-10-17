@@ -49,15 +49,27 @@ app.use(async (req, res, next) => {
 app.get("/", (req, res) => {
   res.send("Myntra backend in working");
 });
-app.use("/user", userrouter);
-app.use("/category", categoryrouter);
-app.use("/product", productrouter);
-app.use("/bag", Bagroutes);
-app.use("/wishlist", Wishlistroutes);
-app.use("/Order", OrderRoutes);
-app.use("/activity", ActivityRoutes);
-app.use("/notification", NotificationRoutes);
-app.use("/recommendations", RecommendationRoutes);
+app.get("/api", (req, res) => {
+  res.json({ status: "ok", message: "Myntra API is working" });
+});
+
+const apiRouters = [
+  { path: "/user", router: userrouter },
+  { path: "/category", router: categoryrouter },
+  { path: "/product", router: productrouter },
+  { path: "/bag", router: Bagroutes },
+  { path: "/wishlist", router: Wishlistroutes },
+  { path: "/Order", router: OrderRoutes },
+  { path: "/order", router: OrderRoutes },
+  { path: "/activity", router: ActivityRoutes },
+  { path: "/notification", router: NotificationRoutes },
+  { path: "/recommendations", router: RecommendationRoutes },
+];
+
+apiRouters.forEach(({ path, router }) => {
+  app.use(path, router);
+  app.use(`/api${path}`, router);
+});
 
 // Start scheduled notification background worker when not in Vercel serverless
 if (!process.env.VERCEL) {

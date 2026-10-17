@@ -34,26 +34,41 @@ export default function ProductDetails() {
   const [product, setproduct] = useState<any>(null);
   const [iswishlist, setiswishlist] = useState(false);
 
+  const cleanId = Array.isArray(id) ? id[0] : id;
+
   useEffect(() => {
+    let isMounted = true;
     const fetchproduct = async () => {
+      if (!cleanId) return;
       try {
         setIsLoading(true);
-        const res = await api.get(`/product/${id}`);
+        const res = await api.get(`/product/${cleanId}`);
         const productData = res.data;
-        setproduct(productData);
-        if (productData && productData._id) {
-          recordProductView(productData);
+        if (isMounted) {
+          if (productData && typeof productData === "object" && productData._id) {
+            setproduct(productData);
+            if (productData.sizes && Array.isArray(productData.sizes) && productData.sizes.length > 0) {
+              setSelectedSize(productData.sizes[0]);
+            }
+            recordProductView(productData);
+          } else {
+            setproduct(null);
+          }
         }
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching product:", error);
+        if (isMounted) setproduct(null);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
-    if (id) {
-      fetchproduct();
-    }
-  }, [id]);
+    fetchproduct();
+    return () => {
+      isMounted = false;
+    };
+  }, [cleanId]);
 
   useEffect(() => {
     startAutoScroll();
@@ -64,11 +79,23 @@ export default function ProductDetails() {
     };
   }, [product]);
 
+  const productImages =
+    product?.images && Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : product?.image
+      ? [product.image]
+      : ["https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&auto=format&fit=crop"];
+
+  const productSizes =
+    product?.sizes && Array.isArray(product.sizes) && product.sizes.length > 0
+      ? product.sizes
+      : ["S", "M", "L", "XL"];
+
   const startAutoScroll = () => {
     if (autoScrollTimer.current) clearInterval(autoScrollTimer.current);
     autoScrollTimer.current = setInterval(() => {
-      if (product && product.images && product.images.length > 1 && scrollViewRef.current) {
-        const nextIndex = (currentImageIndex + 1) % product.images.length;
+      if (productImages.length > 1 && scrollViewRef.current) {
+        const nextIndex = (currentImageIndex + 1) % productImages.length;
         scrollViewRef.current.scrollTo({
           x: nextIndex * width,
           animated: true,
@@ -176,7 +203,7 @@ export default function ProductDetails() {
           <ArrowLeft size={24} color={colors.title} />
         </TouchableOpacity>
         <Text style={[styles.topTitle, { color: colors.title }]} numberOfLines={1}>
-          {product.brand}
+          {product.brand || product.name || "Product Details"}
         </Text>
         <TouchableOpacity style={styles.wishlistButton} onPress={handleAddwishlist}>
           <Heart
@@ -198,7 +225,7 @@ export default function ProductDetails() {
             onScroll={handleScroll}
             scrollEventThrottle={16}
           >
-            {(product.images || []).map((image: any, index: any) => (
+            {productImages.map((image: any, index: any) => (
               <Image
                 key={index}
                 source={{ uri: image }}
@@ -208,7 +235,7 @@ export default function ProductDetails() {
             ))}
           </ScrollView>
           <View style={styles.pagination}>
-            {(product.images || []).map((_: any, index: any) => (
+            {productImages.map((_: any, index: any) => (
               <View
                 key={index}
                 style={[
@@ -226,23 +253,25 @@ export default function ProductDetails() {
         <View style={[styles.content, { backgroundColor: colors.bg }]}>
           <View style={styles.header}>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.brand, { color: colors.sub }]}>{product.brand}</Text>
-              <Text style={[styles.name, { color: colors.title }]}>{product.name}</Text>
+              <Text style={[styles.brand, { color: colors.sub }]}>{product.brand || "Brand"}</Text>
+              <Text style={[styles.name, { color: colors.title }]}>{product.name || product.title}</Text>
             </View>
           </View>
 
           <View style={styles.priceContainer}>
-            <Text style={[styles.price, { color: colors.title }]}>₹{product.price}</Text>
-            <Text style={[styles.discount, { color: colors.primary }]}>{product.discount}</Text>
+            <Text style={[styles.price, { color: colors.title }]}>₹{product.price ?? 0}</Text>
+            {product.discount ? (
+              <Text style={[styles.discount, { color: colors.primary }]}>{product.discount}</Text>
+            ) : null}
           </View>
 
-          <Text style={[styles.description, { color: colors.sub }]}>{product.description}</Text>
+          <Text style={[styles.description, { color: colors.sub }]}>{product.description || ""}</Text>
 
           {/* Size Section */}
           <View style={styles.sizeSection}>
             <Text style={[styles.sizeTitle, { color: colors.title }]}>Select Size</Text>
             <View style={styles.sizeGrid}>
-              {(product.sizes || ["S", "M", "L", "XL"]).map((size: any) => {
+              {productSizes.map((size: any) => {
                 const isSelected = selectedSize === size;
                 return (
                   <TouchableOpacity
