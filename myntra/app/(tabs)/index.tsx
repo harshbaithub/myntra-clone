@@ -18,6 +18,8 @@ import { useNotifications } from "@/context/NotificationContext";
 import { api } from "@/utils/api";
 import RecommendationCarousel from "@/components/RecommendationCarousel";
 
+import DesktopNavbar from "@/components/DesktopNavbar";
+
 const deals = [
   {
     id: 1,
@@ -108,62 +110,67 @@ export default function Home() {
   }, []);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.bg }]} contentContainerStyle={{ paddingBottom: 60 }}>
-      {/* Top Header */}
-      <View
-        style={[
-          styles.header,
-          { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-        ]}
-      >
-        <View style={styles.headerInner}>
-          <Text style={[styles.logo, { color: colors.title }]}>MYNTRA</Text>
-          <View style={styles.headerRightActions}>
-            <TouchableOpacity
-              style={[styles.searchButton, { backgroundColor: colors.surface }]}
-              onPress={() => router.push("/(tabs)/categories")}
-            >
-              <Search size={20} color={colors.title} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.notificationButton, { backgroundColor: colors.surface }]}
-              onPress={() => router.push("/notifications")}
-            >
-              <Bell size={20} color={colors.title} />
-              {unreadCount > 0 && (
-                <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
-                  <Text style={styles.unreadBadgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
-                </View>
-              )}
-            </TouchableOpacity>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      {isDesktop ? (
+        <DesktopNavbar />
+      ) : (
+        /* Mobile Top Header */
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+          ]}
+        >
+          <View style={styles.headerInner}>
+            <Text style={[styles.logo, { color: colors.title }]}>MYNTRA</Text>
+            <View style={styles.headerRightActions}>
+              <TouchableOpacity
+                style={[styles.searchButton, { backgroundColor: colors.surface }]}
+                onPress={() => router.push("/(tabs)/categories")}
+              >
+                <Search size={20} color={colors.title} />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.notificationButton, { backgroundColor: colors.surface }]}
+                onPress={() => router.push("/notifications")}
+              >
+                <Bell size={20} color={colors.title} />
+                {unreadCount > 0 && (
+                  <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
+                    <Text style={styles.unreadBadgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
+      )}
 
-      {/* Main Responsive Centered Container */}
-      <View style={styles.mainContentWrapper}>
-        {/* Floating feedback notification */}
-        {feedbackMessage && (
-          <View style={[styles.feedbackBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}>
-            <Text style={[styles.feedbackText, { color: colors.title }]}>{feedbackMessage}</Text>
-          </View>
-        )}
+      <ScrollView style={[styles.container, { backgroundColor: colors.bg }]} contentContainerStyle={{ paddingBottom: 60 }}>
+        {/* Main Responsive Centered Container */}
+        <View style={styles.mainContentWrapper}>
+          {/* Floating feedback notification */}
+          {feedbackMessage && (
+            <View style={[styles.feedbackBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+              <Text style={[styles.feedbackText, { color: colors.title }]}>{feedbackMessage}</Text>
+            </View>
+          )}
 
-        <Image
-          source={{
-            uri: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&auto=format&fit=crop",
-          }}
-          style={[
-            styles.banner,
-            {
-              height: isDesktop ? 340 : 190,
-              borderRadius: isDesktop ? 16 : 0,
-              marginHorizontal: isDesktop ? 16 : 0,
-              marginTop: isDesktop ? 16 : 0,
-            },
-          ]}
-          resizeMode="cover"
-        />
+          <Image
+            source={{
+              uri: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&auto=format&fit=crop",
+            }}
+            style={[
+              styles.banner,
+              {
+                height: isDesktop ? 340 : 190,
+                borderRadius: isDesktop ? 16 : 0,
+                marginHorizontal: isDesktop ? 16 : 0,
+                marginTop: isDesktop ? 16 : 0,
+              },
+            ]}
+            resizeMode="cover"
+          />
 
       {/* CONTINUE SHOPPING SECTION (Viewed but not purchased) */}
       {continueShopping && continueShopping.length > 0 && (
@@ -470,6 +477,7 @@ export default function Home() {
       </View>
       </View>
     </ScrollView>
+    </View>
   );
 }
 

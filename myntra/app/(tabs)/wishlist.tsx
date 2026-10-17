@@ -7,15 +7,19 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Heart, Trash2 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/utils/api";
+import DesktopNavbar from "@/components/DesktopNavbar";
 
 export default function Wishlist() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const { user } = useAuth();
   const { colors } = useTheme();
   const [wishlist, setwishlist] = useState<any>(null);
@@ -90,16 +94,24 @@ export default function Wishlist() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <View
-        style={[
-          styles.header,
-          { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-        ]}
-      >
-        <Text style={[styles.headerTitle, { color: colors.title }]}>Wishlist</Text>
-      </View>
+      {isDesktop ? (
+        <DesktopNavbar />
+      ) : (
+        <View
+          style={[
+            styles.header,
+            { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+          ]}
+        >
+          <Text style={[styles.headerTitle, { color: colors.title }]}>Wishlist</Text>
+        </View>
+      )}
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ maxWidth: 1000, width: "100%", alignSelf: "center", paddingBottom: 60 }}
+      >
         {!wishlist || wishlist.length === 0 ? (
           <View style={styles.emptyState}>
             <View style={[styles.emptyIconCircle, { backgroundColor: colors.surface }]}>

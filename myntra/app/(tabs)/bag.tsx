@@ -10,6 +10,7 @@ import {
   Alert,
   TextInput,
   RefreshControl,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import {
@@ -34,9 +35,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/utils/api";
 import RecommendationCarousel from "@/components/RecommendationCarousel";
+import DesktopNavbar from "@/components/DesktopNavbar";
 
 export default function Bag() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   const { user } = useAuth();
   const { colors } = useTheme();
 
@@ -270,23 +274,28 @@ export default function Bag() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      {/* Top Header */}
-      <View style={[styles.header, { backgroundColor: colors.header, borderBottomColor: colors.headerBorder }]}>
-        <View style={{ flex: 1 }}>
-          <Text style={[styles.headerTitle, { color: colors.title }]}>Shopping Bag</Text>
-          <Text style={[styles.headerSub, { color: colors.sub }]}>
-            {summary.itemCount || 0} item(s) in bag • {savedItems.length} saved for later
-          </Text>
+      {isDesktop ? (
+        <DesktopNavbar />
+      ) : (
+        /* Top Header */
+        <View style={[styles.header, { backgroundColor: colors.header, borderBottomColor: colors.headerBorder }]}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.headerTitle, { color: colors.title }]}>Shopping Bag</Text>
+            <Text style={[styles.headerSub, { color: colors.sub }]}>
+              {summary.itemCount || 0} item(s) in bag • {savedItems.length} saved for later
+            </Text>
+          </View>
+          <View style={[styles.headerBadge, { backgroundColor: colors.primaryLight }]}>
+            <ShieldCheck size={14} color={colors.primary} style={{ marginRight: 4 }} />
+            <Text style={[styles.headerBadgeText, { color: colors.primary }]}>Live Sync</Text>
+          </View>
         </View>
-        <View style={[styles.headerBadge, { backgroundColor: colors.primaryLight }]}>
-          <ShieldCheck size={14} color={colors.primary} style={{ marginRight: 4 }} />
-          <Text style={[styles.headerBadgeText, { color: colors.primary }]}>Live Sync</Text>
-        </View>
-      </View>
+      )}
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ maxWidth: 1000, width: "100%", alignSelf: "center", paddingBottom: 60 }}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} colors={[colors.primary]} />}
       >
         {/* Real-time Free Shipping Progress Bar */}

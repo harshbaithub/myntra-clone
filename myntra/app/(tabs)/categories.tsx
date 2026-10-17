@@ -14,6 +14,7 @@ import { useRouter } from "expo-router";
 import { Search, X, ChevronLeft } from "lucide-react-native";
 import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/utils/api";
+import DesktopNavbar from "@/components/DesktopNavbar";
 
 export default function TabTwoScreen() {
   const router = useRouter();
@@ -202,44 +203,54 @@ export default function TabTwoScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
-      <View
-        style={[
-          styles.header,
-          { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-        ]}
-      >
-        <Text style={[styles.headerTitle, { color: colors.title }]}>Categories</Text>
-      </View>
+      {isDesktop ? (
+        <DesktopNavbar onSearch={handleSearch} />
+      ) : (
+        <>
+          <View
+            style={[
+              styles.header,
+              { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+            ]}
+          >
+            <Text style={[styles.headerTitle, { color: colors.title }]}>Categories</Text>
+          </View>
 
-      <View
-        style={[
-          styles.searchContainer,
-          { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
-        ]}
-      >
-        <View
-          style={[
-            styles.searchInputContainer,
-            { backgroundColor: colors.inputBg, borderColor: colors.inputBorder },
-          ]}
-        >
-          <Search size={18} color={colors.sub} style={styles.searchIcon} />
-          <TextInput
-            style={[styles.searchInput, { color: colors.text }]}
-            placeholder="Search for products, brands and more"
-            placeholderTextColor={colors.placeholderText}
-            value={searchQuery}
-            onChangeText={handleSearch}
-          />
-          {searchQuery !== "" && (
-            <TouchableOpacity onPress={clearSearch}>
-              <X size={18} color={colors.sub} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
+          <View
+            style={[
+              styles.searchContainer,
+              { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+            ]}
+          >
+            <View
+              style={[
+                styles.searchInputContainer,
+                { backgroundColor: colors.inputBg, borderColor: colors.inputBorder },
+              ]}
+            >
+              <Search size={18} color={colors.sub} style={styles.searchIcon} />
+              <TextInput
+                style={[styles.searchInput, { color: colors.text }]}
+                placeholder="Search for products, brands and more"
+                placeholderTextColor={colors.placeholderText}
+                value={searchQuery}
+                onChangeText={handleSearch}
+              />
+              {searchQuery !== "" && (
+                <TouchableOpacity onPress={clearSearch}>
+                  <X size={18} color={colors.sub} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+        </>
+      )}
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.content}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ maxWidth: 1240, width: "100%", alignSelf: "center", paddingBottom: 60 }}
+      >
         {!selectedCategory && (
           <View style={styles.categoriesGrid}>
             {filtercategories?.map((category: any) => (
