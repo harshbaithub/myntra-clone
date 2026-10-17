@@ -86,7 +86,8 @@ router.post("/create/:userId", async (req, res) => {
     const userid = req.params.userId;
     const { shippingAddress, shippingAddressDetails, paymentMethod = "COD", transactionId } = req.body;
 
-    const validBag = bag.filter((item) => item.productId);
+    const bag = await Bag.find({ userId: userid, isSavedForLater: false }).populate("productId");
+    const validBag = (bag || []).filter((item) => item.productId);
     if (!validBag || validBag.length === 0) {
       return res.status(400).json({ message: "No valid items in bag to checkout. Please add items to your shopping bag." });
     }

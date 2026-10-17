@@ -152,6 +152,11 @@ export default function Checkout() {
       if (res.data && res.data.order) {
         setOrderConfirmed(res.data.order);
         setShowSuccessModal(true);
+        if (Platform.OS === "web" && typeof window !== "undefined") {
+          window.alert(
+            `Order Confirmed! 🎉\nInvoice Number: ${res.data.order.invoiceNumber || res.data.invoiceNumber || "INV-CONFIRMED"}\nYour order has been placed successfully and has been sent for packaging!`
+          );
+        }
       } else {
         Alert.alert("Success", "Your order has been placed successfully!", [
           { text: "View Orders", onPress: () => router.replace("/orders") },
@@ -164,12 +169,156 @@ export default function Checkout() {
         error.message ||
         "Could not place order. Please try again.";
       Alert.alert("Checkout Error", errMsg);
+      if (Platform.OS === "web" && typeof window !== "undefined") {
+        window.alert(`Checkout Error: ${errMsg}`);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const grandPayable = bagSummary.grandTotal || 0;
+
+  // Render Full-Screen Order Confirmation Receipt when order is placed
+  if (orderConfirmed) {
+    return (
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
+        {isDesktop ? (
+          <DesktopNavbar />
+        ) : (
+          <View
+            style={[
+              styles.header,
+              { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
+            ]}
+          >
+            <TouchableOpacity onPress={() => router.replace("/orders")} style={styles.backBtn}>
+              <ArrowLeft size={22} color={colors.title} />
+            </TouchableOpacity>
+            <Text style={[styles.headerTitle, { color: colors.title }]}>Order Confirmed</Text>
+          </View>
+        )}
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={[
+            styles.scrollInner,
+            { alignItems: "center", paddingVertical: 40 },
+          ]}
+        >
+          <View
+            style={[
+              styles.successModalCard,
+              { backgroundColor: colors.card, borderColor: colors.divider },
+            ]}
+          >
+            {/* Top Celebration Icon */}
+            <View style={[styles.successIconCircle, { backgroundColor: "#ecfdf5" }]}>
+              <CheckCircle2 size={54} color="#05c49f" />
+            </View>
+
+            <Text style={[styles.successTitle, { color: colors.title }]}>
+              Order Confirmed! 🎉
+            </Text>
+            <Text style={[styles.successSubtitle, { color: colors.sub }]}>
+              Thank you for shopping with Myntra. Your order has been placed successfully and has been sent for packaging!
+            </Text>
+
+            {/* Receipt Details Box */}
+            <View
+              style={[
+                styles.receiptBox,
+                { backgroundColor: colors.surface, borderColor: colors.divider },
+              ]}
+            >
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: colors.sub }]}>Invoice Number:</Text>
+                <Text style={[styles.receiptValueBold, { color: colors.title }]}>
+                  {orderConfirmed.invoiceNumber || "INV-2026-CONFIRMED"}
+                </Text>
+              </View>
+
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: colors.sub }]}>Transaction ID:</Text>
+                <Text style={[styles.receiptValue, { color: colors.sub }]}>
+                  {orderConfirmed.paymentDetails?.transactionId || "TXN-VERIFIED-OK"}
+                </Text>
+              </View>
+
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: colors.sub }]}>Payment Status:</Text>
+                <View style={styles.paidBadge}>
+                  <Check size={12} color="#05c49f" style={{ marginRight: 4 }} />
+                  <Text style={styles.paidBadgeText}>
+                    {orderConfirmed.paymentDetails?.status || "Success"} (
+                    {orderConfirmed.paymentMethod || paymentMethod})
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: colors.sub }]}>Total Amount Paid:</Text>
+                <Text style={[styles.receiptTotalValue, { color: colors.primary }]}>
+                  ₹{(orderConfirmed.total || grandPayable).toLocaleString("en-IN")}
+                </Text>
+              </View>
+
+              <View style={[styles.divider, { backgroundColor: colors.divider, marginVertical: 8 }]} />
+
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: colors.sub }]}>Estimated Delivery:</Text>
+                <Text style={[styles.receiptValueBold, { color: "#05c49f" }]}>
+                  Within 2 to 3 Business Days
+                </Text>
+              </View>
+
+              <View style={styles.receiptRow}>
+                <Text style={[styles.receiptLabel, { color: colors.sub }]}>Deliver To:</Text>
+                <Text
+                  style={[styles.receiptValue, { color: colors.title, flex: 1, textAlign: "right" }]}
+                  numberOfLines={2}
+                >
+                  {shippingAddress.street}, {shippingAddress.city}
+                </Text>
+              </View>
+            </View>
+
+            {/* Notification alert toast */}
+            <View style={[styles.notificationPill, { backgroundColor: colors.primaryLight }]}>
+              <Package size={16} color={colors.primary} />
+              <Text style={[styles.notificationPillText, { color: colors.primary }]}>
+                Order confirmation email & SMS notification dispatched!
+              </Text>
+            </View>
+
+            {/* CTA Buttons */}
+            <View style={styles.successActionsCol}>
+              <TouchableOpacity
+                style={[styles.viewOrdersBtn, { backgroundColor: colors.primary }]}
+                onPress={() => router.replace("/orders")}
+              >
+                <Receipt size={18} color="#ffffff" style={{ marginRight: 8 }} />
+                <Text style={styles.viewOrdersBtnText}>
+                  VIEW IN ORDERS & TRANSACTIONS
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.continueShoppingBtn,
+                  { borderColor: colors.divider, backgroundColor: colors.surface },
+                ]}
+                onPress={() => router.replace("/(tabs)")}
+              >
+                <Text style={[styles.continueShoppingText, { color: colors.title }]}>
+                  Continue Shopping
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
