@@ -91,13 +91,15 @@ export default function ProductDetails() {
       ? product.sizes
       : ["S", "M", "L", "XL"];
 
+  const carouselWidth = Math.min(width, 600);
+
   const startAutoScroll = () => {
     if (autoScrollTimer.current) clearInterval(autoScrollTimer.current);
     autoScrollTimer.current = setInterval(() => {
       if (productImages.length > 1 && scrollViewRef.current) {
         const nextIndex = (currentImageIndex + 1) % productImages.length;
         scrollViewRef.current.scrollTo({
-          x: nextIndex * width,
+          x: nextIndex * carouselWidth,
           animated: true,
         });
         setCurrentImageIndex(nextIndex);
@@ -153,7 +155,7 @@ export default function ProductDetails() {
 
   const handleScroll = (event: any) => {
     const contentOffset = event.nativeEvent.contentOffset;
-    const imageIndex = Math.round(contentOffset.x / width);
+    const imageIndex = Math.round(contentOffset.x / carouselWidth);
     setCurrentImageIndex(imageIndex);
 
     if (autoScrollTimer.current) {
@@ -199,56 +201,66 @@ export default function ProductDetails() {
           { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
         ]}
       >
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-          <ArrowLeft size={24} color={colors.title} />
-        </TouchableOpacity>
-        <Text style={[styles.topTitle, { color: colors.title }]} numberOfLines={1}>
-          {product.brand || product.name || "Product Details"}
-        </Text>
-        <TouchableOpacity style={styles.wishlistButton} onPress={handleAddwishlist}>
-          <Heart
-            size={22}
-            color={iswishlist ? colors.primary : colors.title}
-            fill={iswishlist ? colors.primary : "none"}
-          />
-        </TouchableOpacity>
+        <View style={styles.headerInner}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <ArrowLeft size={24} color={colors.title} />
+          </TouchableOpacity>
+          <Text style={[styles.topTitle, { color: colors.title }]} numberOfLines={1}>
+            {product.brand || product.name || "Product Details"}
+          </Text>
+          <TouchableOpacity style={styles.wishlistButton} onPress={handleAddwishlist}>
+            <Heart
+              size={22}
+              color={iswishlist ? colors.primary : colors.title}
+              fill={iswishlist ? colors.primary : "none"}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Carousel */}
-        <View style={styles.carouselContainer}>
-          <ScrollView
-            ref={scrollViewRef}
-            horizontal
-            pagingEnabled
-            showsHorizontalScrollIndicator={false}
-            onScroll={handleScroll}
-            scrollEventThrottle={16}
-          >
-            {productImages.map((image: any, index: any) => (
-              <Image
-                key={index}
-                source={{ uri: image }}
-                style={[styles.productImage, { width, backgroundColor: colors.surface }]}
-                resizeMode="cover"
-              />
-            ))}
-          </ScrollView>
-          <View style={styles.pagination}>
-            {productImages.map((_: any, index: any) => (
-              <View
-                key={index}
-                style={[
-                  styles.paginationDot,
-                  currentImageIndex === index && {
-                    backgroundColor: colors.primary,
-                    width: 12,
-                  },
-                ]}
-              />
-            ))}
+        <View style={styles.mainWrapper}>
+          {/* Carousel */}
+          <View style={[styles.carouselContainer, { width: carouselWidth, alignSelf: "center" }]}>
+            <ScrollView
+              ref={scrollViewRef}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onScroll={handleScroll}
+              scrollEventThrottle={16}
+            >
+              {productImages.map((image: any, index: any) => (
+                <Image
+                  key={index}
+                  source={{ uri: image }}
+                  style={[
+                    styles.productImage,
+                    {
+                      width: carouselWidth,
+                      height: Math.min(carouselWidth * 1.25, 520),
+                      backgroundColor: colors.surface,
+                    },
+                  ]}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+            <View style={styles.pagination}>
+              {productImages.map((_: any, index: any) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.paginationDot,
+                    currentImageIndex === index && {
+                      backgroundColor: colors.primary,
+                      width: 12,
+                    },
+                  ]}
+                />
+              ))}
+            </View>
           </View>
-        </View>
 
         <View style={[styles.content, { backgroundColor: colors.bg }]}>
           <View style={styles.header}>
@@ -371,6 +383,7 @@ export default function ProductDetails() {
             limit={8}
           />
         </View>
+        </View>
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -386,7 +399,7 @@ export default function ProductDetails() {
         ]}
       >
         <TouchableOpacity
-          style={[styles.addToBagButton, { backgroundColor: colors.primary }]}
+          style={[styles.addToBagButton, { backgroundColor: colors.primary, maxWidth: 600, width: "100%", alignSelf: "center" }]}
           onPress={handleAddToBag}
           disabled={loading}
         >
@@ -408,14 +421,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  topBar: {
+  headerInner: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    width: "100%",
+    maxWidth: 650,
+    alignSelf: "center",
+  },
+  mainWrapper: {
+    width: "100%",
+    maxWidth: 650,
+    alignSelf: "center",
+  },
+  topBar: {
     paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 14,
     borderBottomWidth: 1,
+    width: "100%",
   },
   backBtn: {
     marginRight: 10,

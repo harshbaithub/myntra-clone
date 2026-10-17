@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Search, X, ChevronLeft } from "lucide-react-native";
@@ -16,6 +17,7 @@ import { api } from "@/utils/api";
 
 export default function TabTwoScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -23,6 +25,14 @@ export default function TabTwoScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [categories, setcategories] = useState<any[]>([]);
+
+  const isDesktop = width >= 768;
+  const isLargeDesktop = width >= 1100;
+  const containerWidth = Math.min(width, 1200) - 32;
+  const numColumns = isLargeDesktop ? 4 : isDesktop ? 3 : 2;
+  const cardGap = 16;
+  const cardWidth = Math.floor((containerWidth - (numColumns - 1) * cardGap) / numColumns);
+  const cardImageHeight = Math.round(cardWidth * 1.3);
 
   const fetchproduct = async (isRefresh = false) => {
     try {
@@ -155,16 +165,24 @@ export default function TabTwoScreen() {
       );
     }
     return (
-      <View style={styles.productsGrid}>
+      <View style={[styles.productsGrid, { gap: cardGap }]}>
         {products.map((product: any) => (
           <TouchableOpacity
             key={product._id}
-            style={[styles.productCard, { backgroundColor: colors.card, borderColor: colors.divider }]}
+            style={[
+              styles.productCard,
+              {
+                width: cardWidth,
+                backgroundColor: colors.card,
+                borderColor: colors.divider,
+              },
+            ]}
             onPress={() => router.push(`/product/${product._id}`)}
           >
             <Image
               source={{ uri: product.images?.[0] || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500" }}
-              style={styles.productImage}
+              style={[styles.productImage, { height: cardImageHeight }]}
+              resizeMode="cover"
             />
             <View style={styles.productInfo}>
               <Text style={[styles.brandName, { color: colors.sub }]}>{product.brand}</Text>
@@ -454,12 +472,11 @@ const styles = StyleSheet.create({
   productsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
   productCard: {
-    width: "48%",
-    borderRadius: 12,
     marginBottom: 16,
+    borderRadius: 12,
     borderWidth: 1,
     overflow: "hidden",
     shadowColor: "#000",
@@ -470,7 +487,6 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: 180,
   },
   productInfo: {
     padding: 10,

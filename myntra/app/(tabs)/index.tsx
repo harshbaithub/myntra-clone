@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Search, ChevronRight, Heart, ShoppingBag, X, Bell } from "lucide-react-native";
@@ -34,6 +35,7 @@ const deals = [
 
 export default function Home() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { colors } = useTheme();
   const { unreadCount } = useNotifications();
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +43,16 @@ export default function Home() {
   const [categories, setcategories] = useState<any>(null);
   const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const { user } = useAuth();
+
+  const isDesktop = width >= 768;
+  const isLargeDesktop = width >= 1100;
+
+  // Responsive Grid Calculations
+  const containerWidth = Math.min(width, 1200) - 32;
+  const numColumns = isLargeDesktop ? 4 : isDesktop ? 3 : 2;
+  const cardGap = 16;
+  const cardWidth = Math.floor((containerWidth - (numColumns - 1) * cardGap) / numColumns);
+  const cardImageHeight = Math.round(cardWidth * 1.3);
   const {
     recentlyViewed,
     continueShopping,
@@ -96,7 +108,7 @@ export default function Home() {
   }, []);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.bg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.bg }]} contentContainerStyle={{ paddingBottom: 60 }}>
       {/* Top Header */}
       <View
         style={[
@@ -104,41 +116,54 @@ export default function Home() {
           { backgroundColor: colors.header, borderBottomColor: colors.headerBorder },
         ]}
       >
-        <Text style={[styles.logo, { color: colors.title }]}>MYNTRA</Text>
-        <View style={styles.headerRightActions}>
-          <TouchableOpacity
-            style={[styles.searchButton, { backgroundColor: colors.surface }]}
-            onPress={() => router.push("/(tabs)/categories")}
-          >
-            <Search size={20} color={colors.title} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.notificationButton, { backgroundColor: colors.surface }]}
-            onPress={() => router.push("/notifications")}
-          >
-            <Bell size={20} color={colors.title} />
-            {unreadCount > 0 && (
-              <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
-                <Text style={styles.unreadBadgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
-              </View>
-            )}
-          </TouchableOpacity>
+        <View style={styles.headerInner}>
+          <Text style={[styles.logo, { color: colors.title }]}>MYNTRA</Text>
+          <View style={styles.headerRightActions}>
+            <TouchableOpacity
+              style={[styles.searchButton, { backgroundColor: colors.surface }]}
+              onPress={() => router.push("/(tabs)/categories")}
+            >
+              <Search size={20} color={colors.title} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.notificationButton, { backgroundColor: colors.surface }]}
+              onPress={() => router.push("/notifications")}
+            >
+              <Bell size={20} color={colors.title} />
+              {unreadCount > 0 && (
+                <View style={[styles.unreadBadge, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.unreadBadgeText}>{unreadCount > 9 ? "9+" : unreadCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
-      {/* Floating feedback notification */}
-      {feedbackMessage && (
-        <View style={[styles.feedbackBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}>
-          <Text style={[styles.feedbackText, { color: colors.title }]}>{feedbackMessage}</Text>
-        </View>
-      )}
+      {/* Main Responsive Centered Container */}
+      <View style={styles.mainContentWrapper}>
+        {/* Floating feedback notification */}
+        {feedbackMessage && (
+          <View style={[styles.feedbackBanner, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+            <Text style={[styles.feedbackText, { color: colors.title }]}>{feedbackMessage}</Text>
+          </View>
+        )}
 
-      <Image
-        source={{
-          uri: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&auto=format&fit=crop",
-        }}
-        style={styles.banner}
-      />
+        <Image
+          source={{
+            uri: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1200&auto=format&fit=crop",
+          }}
+          style={[
+            styles.banner,
+            {
+              height: isDesktop ? 340 : 190,
+              borderRadius: isDesktop ? 16 : 0,
+              marginHorizontal: isDesktop ? 16 : 0,
+              marginTop: isDesktop ? 16 : 0,
+            },
+          ]}
+          resizeMode="cover"
+        />
 
       {/* CONTINUE SHOPPING SECTION (Viewed but not purchased) */}
       {continueShopping && continueShopping.length > 0 && (
@@ -396,52 +421,53 @@ export default function Home() {
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: colors.title }]}>TRENDING NOW</Text>
         </View>
-        <View style={styles.productsGrid}>
-          {isLoading ? (
-            <ActivityIndicator
-              size="large"
-              color={colors.primary}
-              style={styles.loader}
-            />
-          ) : !product || product.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.sub }]}>No Product available</Text>
-          ) : (
-            <View style={styles.productsGrid}>
-              {product.map((p: any) => (
-                <TouchableOpacity
-                  key={p._id}
-                  style={[
-                    styles.productCard,
-                    {
-                      backgroundColor: colors.card,
-                      borderColor: colors.divider,
-                    },
-                  ]}
-                  onPress={() => handleProductPress(p._id)}
-                >
-                  <Image
-                    source={{
-                      uri:
-                        p.images?.[0] ||
-                        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
-                    }}
-                    style={styles.productImage}
-                  />
-                  <View style={styles.productInfo}>
-                    <Text style={[styles.brandName, { color: colors.sub }]}>{p.brand}</Text>
-                    <Text style={[styles.productName, { color: colors.title }]} numberOfLines={1}>
-                      {p.name}
-                    </Text>
-                    <View style={styles.priceRow}>
-                      <Text style={[styles.productPrice, { color: colors.title }]}>₹{p.price}</Text>
-                      <Text style={[styles.discount, { color: colors.primary }]}>{p.discount}</Text>
-                    </View>
+        {isLoading ? (
+          <ActivityIndicator
+            size="large"
+            color={colors.primary}
+            style={styles.loader}
+          />
+        ) : !product || product.length === 0 ? (
+          <Text style={[styles.emptyText, { color: colors.sub }]}>No Product available</Text>
+        ) : (
+          <View style={[styles.productsGrid, { gap: cardGap }]}>
+            {product.map((p: any) => (
+              <TouchableOpacity
+                key={p._id}
+                style={[
+                  styles.productCard,
+                  {
+                    width: cardWidth,
+                    backgroundColor: colors.card,
+                    borderColor: colors.divider,
+                  },
+                ]}
+                onPress={() => handleProductPress(p._id)}
+              >
+                <Image
+                  source={{
+                    uri:
+                      p.images?.[0] ||
+                      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500",
+                  }}
+                  style={[styles.productImage, { height: cardImageHeight }]}
+                  resizeMode="cover"
+                />
+                <View style={styles.productInfo}>
+                  <Text style={[styles.brandName, { color: colors.sub }]}>{p.brand}</Text>
+                  <Text style={[styles.productName, { color: colors.title }]} numberOfLines={1}>
+                    {p.name}
+                  </Text>
+                  <View style={styles.priceRow}>
+                    <Text style={[styles.productPrice, { color: colors.title }]}>₹{p.price}</Text>
+                    <Text style={[styles.discount, { color: colors.primary }]}>{p.discount}</Text>
                   </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-        </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
       </View>
     </ScrollView>
   );
@@ -451,14 +477,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  mainContentWrapper: {
+    width: "100%",
+    maxWidth: 1200,
+    alignSelf: "center",
+  },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     paddingHorizontal: 16,
     paddingTop: 50,
     paddingBottom: 14,
     borderBottomWidth: 1,
+    width: "100%",
+  },
+  headerInner: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    width: "100%",
+    maxWidth: 1200,
+    alignSelf: "center",
   },
   logo: {
     fontSize: 22,
@@ -585,10 +622,9 @@ const styles = StyleSheet.create({
   productsGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
   },
   productCard: {
-    width: "48%",
     marginBottom: 16,
     borderRadius: 12,
     overflow: "hidden",
@@ -601,7 +637,6 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: "100%",
-    height: 190,
   },
   productInfo: {
     padding: 10,
