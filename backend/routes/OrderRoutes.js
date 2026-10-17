@@ -86,20 +86,27 @@ router.post("/create/:userId", async (req, res) => {
     const userid = req.params.userId;
     const { shippingAddress, shippingAddressDetails, paymentMethod = "COD", transactionId } = req.body;
 
-    const bag = await Bag.find({ userId: userid }).populate("productId");
-    if (!bag || bag.length === 0) {
-      return res.status(400).json({ message: "No items in bag to checkout" });
+    const validBag = bag.filter((item) => item.productId);
+    if (!validBag || validBag.length === 0) {
+      return res.status(400).json({ message: "No valid items in bag to checkout. Please add items to your shopping bag." });
     }
 
-    const orderItems = bag.map((item) => ({
-      productId: item.productId._id,
-      size: item.size || "M",
-      price: item.productId.price,
-      quantity: item.quantity || 1,
-      title: item.productId.title,
-      brand: item.productId.brand,
-      image: item.productId.image,
-    }));
+    const orderItems = validBag.map((item) => {
+      const p = item.productId;
+      const img =
+        (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null) ||
+        p.image ||
+        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500";
+      return {
+        productId: p._id,
+        size: item.size || "M",
+        price: p.price || 0,
+        quantity: item.quantity || 1,
+        title: p.name || p.title || "Fashion Apparel",
+        brand: p.brand || "MYNTRA",
+        image: img,
+      };
+    });
 
     const rawSubtotal = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = Math.round(rawSubtotal * 0.18);
@@ -139,12 +146,13 @@ router.post("/create/:userId", async (req, res) => {
     await Bag.deleteMany({ userId: userid });
 
     // Record initial transaction audit log
+    const isCod = (paymentMethod || "").toUpperCase().includes("COD");
     const auditLog = new PaymentAuditLog({
       orderId: newOrder._id,
       userId: userid,
       transactionId: finalTxnId,
-      gateway: paymentMethod === "COD" ? "COD" : "Razorpay",
-      eventType: paymentMethod === "COD" ? "payment.authorized" : "payment.captured",
+      gateway: isCod ? "COD" : "Razorpay",
+      eventType: isCod ? "payment.authorized" : "payment.captured",
       amount: grandTotal,
       currency: "INR",
       verificationStatus: "VERIFIED",

@@ -13,9 +13,11 @@ import {
   Platform,
   RefreshControl,
   Share,
+  useWindowDimensions,
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
+import DesktopNavbar from "@/components/DesktopNavbar";
 import {
   Package,
   MapPin,
@@ -61,6 +63,8 @@ export default function Orders() {
   const router = useRouter();
   const { user } = useAuth();
   const { colors, isDark } = useTheme();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
 
   // Primary states
   const [activeTab, setActiveTab] = useState<"orders" | "transactions">("orders");
@@ -308,6 +312,7 @@ export default function Orders() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bg }]}>
+      {isDesktop && <DesktopNavbar />}
       {/* Top Header */}
       <View style={[styles.header, { backgroundColor: colors.header, borderBottomColor: colors.headerBorder }]}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>

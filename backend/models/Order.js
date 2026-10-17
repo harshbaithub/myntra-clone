@@ -43,7 +43,7 @@ const OrderItemSchema = new mongoose.Schema({
 });
 
 const PaymentDetailsSchema = new mongoose.Schema({
-  method: { type: String, enum: ["COD", "Card", "UPI", "NetBanking", "Wallet"], default: "COD" },
+  method: { type: String, default: "COD" },
   transactionId: { type: String },
   status: { type: String, enum: ["Pending", "Success", "Failed", "Refunded"], default: "Success" },
   paidAt: { type: Date, default: Date.now },

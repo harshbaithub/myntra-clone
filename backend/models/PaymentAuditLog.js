@@ -7,7 +7,6 @@ const PaymentAuditLogSchema = new mongoose.Schema(
     transactionId: { type: String, required: true, unique: true, index: true },
     gateway: {
       type: String,
-      enum: ["Razorpay", "Stripe", "PayTM", "UPI", "MockGateway", "COD"],
       default: "Razorpay",
     },
     eventType: {
