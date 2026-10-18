@@ -12,10 +12,11 @@ import {
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Search, X, ChevronLeft, ArrowLeft } from "lucide-react-native";
+import { Search, X, ChevronLeft, ArrowLeft, ChevronRight, Sparkles } from "lucide-react-native";
 import { useTheme } from "@/context/ThemeContext";
 import { api } from "@/utils/api";
 import DesktopNavbar from "@/components/DesktopNavbar";
+import { getValidCategoryImage } from "@/utils/categoryHelpers";
 
 export default function TabTwoScreen() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function TabTwoScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [categories, setcategories] = useState<any[]>([]);
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
   const isDesktop = width >= 768;
   const isLargeDesktop = width >= 1100;
@@ -272,46 +274,84 @@ export default function TabTwoScreen() {
           </View>
         )}
         {!selectedCategory && (
-          <View style={styles.categoriesGrid}>
-            {filtercategories?.map((category: any) => (
-              <TouchableOpacity
-                key={category._id}
-                style={[
-                  styles.categoryCard,
-                  { backgroundColor: colors.card, borderColor: colors.divider },
-                ]}
-                onPress={() => handleCategorySelect(category._id)}
-                activeOpacity={0.8}
-              >
-                <Image
-                  source={{ uri: category.image }}
-                  style={styles.categoryImage}
-                />
-                <View style={styles.categoryInfo}>
-                  <Text style={[styles.categoryName, { color: colors.title }]}>
-                    {category.name}
-                  </Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    <View style={styles.subcategories}>
-                      {category?.subcategory?.map((sub: any, index: any) => (
-                        <TouchableOpacity
-                          key={index}
-                          style={[
-                            styles.subcategoryTag,
-                            { backgroundColor: colors.surface, borderColor: colors.divider },
-                          ]}
-                          onPress={() => handleSubcategorySelect(sub)}
-                        >
-                          <Text style={[styles.subcategoryText, { color: colors.text }]}>
-                            {sub}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
+          <View style={[styles.categoriesGrid, isDesktop && styles.categoriesGridDesktop]}>
+            {filtercategories?.map((category: any) => {
+              const hasImgError = !!imgErrors[category._id];
+              const imageUri = getValidCategoryImage(category, hasImgError);
+
+              return (
+                <TouchableOpacity
+                  key={category._id}
+                  style={[
+                    styles.categoryCard,
+                    isDesktop ? styles.categoryCardDesktop : styles.categoryCardMobile,
+                    { backgroundColor: colors.card, borderColor: colors.divider },
+                  ]}
+                  onPress={() => handleCategorySelect(category._id)}
+                  activeOpacity={0.88}
+                >
+                  <View style={styles.imageContainer}>
+                    <Image
+                      source={{ uri: imageUri }}
+                      style={isDesktop ? styles.categoryImageDesktop : styles.categoryImageMobile}
+                      resizeMode="cover"
+                      onError={() =>
+                        setImgErrors((prev) => ({ ...prev, [category._id]: true }))
+                      }
+                    />
+                    <View style={styles.imageGradientOverlay} />
+                    <View style={[styles.categoryBadge, { backgroundColor: colors.primary }]}>
+                      <Text style={styles.categoryBadgeText}>TRENDING</Text>
                     </View>
-                  </ScrollView>
-                </View>
-              </TouchableOpacity>
-            ))}
+                  </View>
+
+                  <View style={styles.categoryInfo}>
+                    <View style={styles.categoryTitleRow}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.categoryName, { color: colors.title }]}>
+                          {category.name}
+                        </Text>
+                        <Text style={[styles.categorySubCount, { color: colors.sub }]}>
+                          {category.subcategory?.length || 0} Fashion Categories
+                        </Text>
+                      </View>
+                      <TouchableOpacity
+                        style={[styles.exploreButton, { backgroundColor: colors.primaryLight }]}
+                        onPress={() => handleCategorySelect(category._id)}
+                        activeOpacity={0.7}
+                      >
+                        <Text style={[styles.exploreButtonText, { color: colors.primary }]}>
+                          Explore
+                        </Text>
+                        <ChevronRight size={14} color={colors.primary} />
+                      </TouchableOpacity>
+                    </View>
+
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                      <View style={styles.subcategories}>
+                        {category?.subcategory?.map((sub: any, index: any) => (
+                          <TouchableOpacity
+                            key={index}
+                            style={[
+                              styles.subcategoryTag,
+                              { backgroundColor: colors.surface, borderColor: colors.divider },
+                            ]}
+                            onPress={() => {
+                              handleCategorySelect(category._id);
+                              handleSubcategorySelect(sub);
+                            }}
+                          >
+                            <Text style={[styles.subcategoryText, { color: colors.text }]}>
+                              {sub}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </ScrollView>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         )}
 
@@ -443,28 +483,107 @@ const styles = StyleSheet.create({
   categoriesGrid: {
     padding: 16,
   },
+  categoriesGridDesktop: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    gap: 20,
+    paddingHorizontal: 16,
+  },
   categoryCard: {
-    borderRadius: 14,
+    borderRadius: 16,
     marginBottom: 16,
     borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
     elevation: 3,
     overflow: "hidden",
   },
+  categoryCardDesktop: {
+    width: "48.5%",
+    borderRadius: 18,
+    marginBottom: 0,
+  },
+  categoryCardMobile: {
+    width: "100%",
+    borderRadius: 16,
+    marginBottom: 16,
+  },
+  imageContainer: {
+    width: "100%",
+    position: "relative",
+    backgroundColor: "#1c1c1e",
+  },
+  categoryImageDesktop: {
+    width: "100%",
+    height: 250,
+  },
+  categoryImageMobile: {
+    width: "100%",
+    height: 190,
+  },
+  imageGradientOverlay: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 50,
+    backgroundColor: "rgba(0,0,0,0.18)",
+  },
+  categoryBadge: {
+    position: "absolute",
+    top: 14,
+    left: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
+    elevation: 4,
+  },
+  categoryBadgeText: {
+    color: "#ffffff",
+    fontSize: 10,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+  },
+  categoryTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  categorySubCount: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  exploreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 4,
+  },
+  exploreButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
   categoryImage: {
     width: "100%",
-    height: 150,
+    height: 190,
   },
   categoryInfo: {
-    padding: 14,
+    padding: 16,
   },
   categoryName: {
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: "700",
-    marginBottom: 10,
+    marginBottom: 2,
   },
   subcategories: {
     flexDirection: "row",

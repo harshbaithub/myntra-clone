@@ -19,6 +19,7 @@ import { api } from "@/utils/api";
 import RecommendationCarousel from "@/components/RecommendationCarousel";
 
 import DesktopNavbar from "@/components/DesktopNavbar";
+import { getValidCategoryImage } from "@/utils/categoryHelpers";
 
 const deals = [
   {
@@ -317,7 +318,7 @@ export default function Home() {
                 onPress={() => router.push("/(tabs)/categories")}
               >
                 <Image
-                  source={{ uri: category.image }}
+                  source={{ uri: getValidCategoryImage(category) }}
                   style={[styles.categoryImage, { borderColor: colors.divider, borderWidth: 1 }]}
                 />
                 <Text style={[styles.categoryName, { color: colors.title }]}>{category.name}</Text>
